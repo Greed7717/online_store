@@ -1,7 +1,13 @@
 from django.db.models import Avg
 from rest_framework import serializers
 
-from product.models import Category, Product, Review
+from product.models import Category, Product, Review, Tag
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ('id', 'name')
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -16,9 +22,19 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    tag = TagSerializer(many=True, read_only=True)
+
     class Meta:
         model = Product
         fields = "__all__"
+
+    def validate_tag(self, value):
+        for tag_id in value:
+            try:
+                Tag.objects.get(id=tag_id)
+            except Tag.DoesNotExist as e:
+                raise serializers.ValidationError(str(e))
+        return value
 
 
 class ReviewSerializer(serializers.ModelSerializer):
