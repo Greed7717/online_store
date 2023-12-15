@@ -5,6 +5,8 @@ from rest_framework.response import Response
 
 from product.models import Category, Product, Review
 from product.serializers import CategorySerializer, ProductSerializer, ReviewSerializer, ProductReviewSerializer
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+
 
 
 # Create your views here.
@@ -118,3 +120,37 @@ def review_product_view(request):
     q = Product.objects.all()
     serializer = ProductReviewSerializer(q, many=True).data
     return Response(data=serializer, status=status.HTTP_200_OK)
+
+class ProductListAPIView(ListCreateAPIView):
+    queryset = Product.objects.prefetch_related('tag').all()
+    serializer_class = ProductSerializer
+
+
+class ProductDetailAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+
+class CategoryListAPIView(ListCreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class CategoryDetailAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class ReviewListAPIView(ListCreateAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
+
+class ReviewDetailAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
+
+class ProductReviewListAPIView(ListCreateAPIView):
+    queryset = Product.objects.prefetch_related('reviews').all()
+    serializer_class = ProductReviewSerializer
